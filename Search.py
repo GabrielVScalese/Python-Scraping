@@ -3,6 +3,15 @@ from bs4 import BeautifulSoup
 import http.cookiejar
 from Class import Class
 
+def get_number(value):
+  if value == '--':
+    return None
+    
+  if ',' in value:
+    value = value.replace(',', '.')
+
+  return float(value)
+
 class Search:
 
     def __init__(self, year, ra, password):
@@ -36,8 +45,8 @@ class Search:
       # 2 -> name / 4 -> grade
       for line in lines:
         sub_lines = line.find_all('td')
-
-        classes.append(Class(sub_lines[2].text.strip(), sub_lines[4].text, sub_lines[5].text, sub_lines[8].text, sub_lines[9].text))
+        print(sub_lines)
+        classes.append(Class(sub_lines[2].text.strip(), get_number(sub_lines[4].text), get_number(sub_lines[5].text), get_number(sub_lines[8].text), get_number(sub_lines[9].text)))
 
       return classes 
     
