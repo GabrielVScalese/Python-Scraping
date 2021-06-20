@@ -5,7 +5,8 @@ from Class import Class
 
 class Search:
 
-    def __init__(self, ra, password):
+    def __init__(self, year, ra, password):
+        self.year = year
         self.ra = ra
         self.password = password
         cj = http.cookiejar.CookieJar()
@@ -15,53 +16,49 @@ class Search:
 
         self.br.select_form(nr=0)
         self.br.form['usuario'] = ra
-        self.br.form['senha'] = 'cotuca unicamp20171'
+        self.br.form['senha'] = password
         self.br.submit()
     
     def get_technician_grade(self):
-        self.br.open(f'https://sae.cotuca.unicamp.br/alunos/{self.ra}/boletim?utf8=%E2%9C%93&Ano=2021&curso_aluno=28&commit=Buscar')
+        self.br.open(f'https://sae.cotuca.unicamp.br/alunos/{self.ra}/boletim?utf8=%E2%9C%93&Ano={self.year}&curso_aluno=28&commit=Buscar')
+
         soup = BeautifulSoup(self.br.response().read(), 'html.parser')
 
-        notas_tabela = soup.find_all('table', class_='table table-striped table-bordered')[1]
+        grade_table = soup.find_all('table', class_='table table-striped table-bordered')[1]
 
-        linhas = notas_tabela.find_all('tr')
+        lines = grade_table.find_all('tr')
 
-        # exclui linhas desnecessarias
-        del linhas[0]
-        del linhas[0]
+        del lines[0]
+        del lines[0]
 
         classes = []
 
-        # 2 -> materia / 4 -> nota
-        for linha in linhas:
-            sub_linhas = linha.find_all('td')
-            classes.append(Class(sub_linhas[2].text, sub_linhas[4].text))
+        # 2 -> name / 4 -> grade
+        for line in lines:
+          sub_lines = line.find_all('td')
+
+          classes.append(Class(sub_lines[2].text.strip(), sub_lines[4].text, sub_lines[5].text, sub_lines[8].text, sub_lines[9].text))
 
         return classes
 
     def get_high_school_grade(self):
-        self.br.open(f'https://sae.cotuca.unicamp.br/alunos/{self.ra}/boletim?utf8=%E2%9C%93&Ano=2021&curso_aluno=78&commit=Buscar')
+        self.br.open(f'https://sae.cotuca.unicamp.br/alunos/{self.ra}/boletim?utf8=%E2%9C%93&Ano={self.year}&curso_aluno=78&commit=Buscar')
         
         soup = BeautifulSoup(self.br.response().read(), 'html.parser')
 
-        notas_tabela = soup.find_all('table', class_='table table-striped table-bordered')[1]
+        grade_table = soup.find_all('table', class_='table table-striped table-bordered')[1]
 
-        linhas = notas_tabela.find_all('tr')
+        lines = grade_table.find_all('tr')
 
-        # exclui linhas desnecessarias
-        del linhas[0]
-        del linhas[0]
+        del lines[0]
+        del lines[0]
 
         classes = []
 
-        # 2 -> materia / 4 -> nota
-        for linha in linhas:
-            sub_linhas = linha.find_all('td')
+        # 2 -> name / 4 -> grade
+        for line in lines:
+            sub_lines = line.find_all('td')
 
-            classes.append(Class(sub_linhas[2].text, sub_linhas[4].text, sub_linhas[5].text, sub_linhas[7].text, sub_linhas[8].text))
+            classes.append(Class(sub_lines[2].text.strip(), sub_lines[4].text, sub_lines[5].text, sub_lines[8].text, sub_lines[9].text))
 
         return classes
-
-    
-
-

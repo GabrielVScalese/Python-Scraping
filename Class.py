@@ -1,5 +1,5 @@
 class Class:
-
+    
     def __init__(self, name, first, second, third, fourth):
         self.name = name
         self.first = first
